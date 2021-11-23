@@ -1,0 +1,28 @@
+---
+
+restic_version: 0.12.1
+restic_path: /usr/local/bin/restic
+restic_scripts_directory: /opt/restic
+
+restic_repositories: {}
+#  test:
+#    location: /backup
+#    password: securepassword1
+#    check: true
+#    check_args: "--read-data-subset=10%"
+#    forget: true
+#    forget_args: "--prune --group-by paths,tags --keep-within-daily 14d --keep-within-weekly 4m --keep-within-monthly 1y"
+#    environment_variables: {}
+
+restic_folders: []
+#  - paths:
+#    repositories: []
+#    tags:
+restic_stdouts: []
+#  - cmd:
+#    filename:
+#    repositories: []
+#    tags:
+
+restic_systemd_timer_on_calender: '*-*-* 03:00:00'
+restic_systemd_timer_randomized_delay_sec: 3600

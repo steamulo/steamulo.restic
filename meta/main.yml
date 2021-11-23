@@ -1,0 +1,18 @@
+---
+
+galaxy_info:
+  role_name: restic
+  author: steamulo
+  description: Production grade installation and deployment of restic
+  company: Steamulo
+  license: BSD
+  min_ansible_version: 2.7
+  platforms:
+    - name: Ubuntu
+      versions:
+        - bionic
+        - focal
+    - name: EL
+      versions:
+        - 7
+        - 8

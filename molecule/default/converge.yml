@@ -1,0 +1,39 @@
+---
+- name: Converge
+  hosts: instance
+  become: true
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+      vars:
+        restic_systemd_timer_randomized_delay_sec: 0
+        restic_repositories:
+          local:
+            location: /var/restic_backup
+            password: securepassword1
+            check: true
+            check_args: "--read-data-subset=10%"
+            forget: true
+            forget_args: "--prune --group-by paths,tags --keep-within-daily 4d"
+            environment_variables:
+              FOO: BAR
+        restic_folders:
+          - paths:
+              - /var/lib
+              - /usr
+            repositories:
+              - local
+            tags:
+              - files
+          - paths:
+              - /tmp
+            repositories:
+              - nonexisting
+            tags:
+              - nonexisting
+        restic_stdouts:
+          - cmd: echo "testing"
+            filename: echo.out
+            repositories:
+              - local
+            tags:
+              - echo

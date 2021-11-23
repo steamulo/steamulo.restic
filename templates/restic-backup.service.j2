@@ -1,0 +1,10 @@
+[Unit]
+Description=Restic backup
+
+[Service]
+Type=oneshot
+User=root
+CPUQuota={{ 10 * ansible_processor_vcpus }}%
+{% for repo_name, _ in restic_repositories.items() %}
+ExecStart={{ restic_scripts_directory }}/restic-backup-{{ repo_name }}.sh
+{% endfor -%}
