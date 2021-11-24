@@ -1,0 +1,75 @@
+---
+
+- name: Create restic scripts
+  file:
+    path: "{{ restic_scripts_directory }}"
+    owner: "root"
+    group: "root"
+    mode: '0755'
+    state: directory
+
+- name: Getting all used repo
+  set_fact:
+    restic_used_repositories: "{{ restic_folders | union(restic_stdouts) | map(attribute='repositories') | flatten | unique }}"
+
+- name: Add .restic-password files in home folder
+  copy:
+    content: "{{ restic_repository.value.password }}"
+    dest: "{{ restic_scripts_directory }}/restic-password-{{ restic_repository.key }}"
+    owner: root
+    group: root
+    mode: "0600"
+  loop: "{{ restic_repositories | dict2items }}"
+  when: restic_repository.key in restic_used_repositories
+  loop_control:
+    loop_var: restic_repository
+
+- name: Add .restic-config-source files in home folder
+  copy:
+    content: |
+      #!/usr/bin/env bash
+      export RESTIC_REPOSITORY={{ restic_repository.value.location }}
+      export RESTIC_PASSWORD={{ restic_repository.value.password }}
+      {% for key, value in restic_repository.value.environment_variables.items() %}
+      export {{ key }}={{ value }}
+      {% endfor %}
+    dest: "{{ restic_scripts_directory }}/restic-config-source-{{ restic_repository.key }}"
+    owner: root
+    group: root
+    mode: "0600"
+  loop: "{{ restic_repositories | dict2items }}"
+  when: restic_repository.key in restic_used_repositories
+  loop_control:
+    loop_var: restic_repository
+
+- name: Create restic backup script
+  template:
+    src: restic-backup.sh.j2
+    dest: "{{ restic_scripts_directory }}/restic-backup-{{ restic_repository.key }}.sh"
+    owner: root
+    group: root
+    mode: '0700'
+  loop: "{{ restic_repositories | dict2items }}"
+  when: restic_repository.key in restic_used_repositories
+  loop_control:
+    loop_var: restic_repository
+
+- name: Add systemd service for restic
+  template:
+    src: restic-backup.service.j2
+    dest: /etc/systemd/system/restic-backup.service
+    mode: '0644'
+  notify: systemd reload
+
+- name: Add systemd timer for restic
+  template:
+    src: restic-backup.timer.j2
+    dest: /etc/systemd/system/restic-backup.timer
+    mode: '0644'
+  notify: systemd reload
+
+- name: Enable and start restic timer
+  systemd:
+    name: restic-backup.timer
+    enabled: true
+    state: started

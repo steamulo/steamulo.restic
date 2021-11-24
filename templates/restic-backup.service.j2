@@ -6,5 +6,7 @@ Type=oneshot
 User=root
 CPUQuota={{ 10 * ansible_processor_vcpus }}%
 {% for repo_name, _ in restic_repositories.items() %}
+{% if repo_name in restic_used_repositories %}
 ExecStart={{ restic_scripts_directory }}/restic-backup-{{ repo_name }}.sh
+{% endif -%}
 {% endfor -%}

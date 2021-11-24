@@ -16,6 +16,11 @@
             forget_args: "--prune --group-by paths,tags --keep-within-daily 4d"
             environment_variables:
               FOO: BAR
+          notused:
+            location: /var/restic_backup_2
+            password: securepassword1
+            check: false
+            forget: false
         restic_folders:
           - paths:
               - /var/lib
