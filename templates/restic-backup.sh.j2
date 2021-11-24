@@ -8,7 +8,7 @@ set -euo pipefail
 {%- endmacro %}
 
 {% for key, value in (restic_repository.value.environment_variables | default({})).items() %}
-{{ key }}={{ value }}
+export {{ key }}={{ value }}
 {% endfor %}
 
 if ! {{ restic_path }} snapshots {{ repo_args(restic_repository.key) }} --latest 1 > /dev/null 2>&1; then
