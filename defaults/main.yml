@@ -3,6 +3,7 @@
 restic_version: 0.12.1
 restic_path: /usr/local/bin/restic
 restic_scripts_directory: /opt/restic
+restic_cache_directory: /opt/restic/cache
 
 restic_repositories: {}
 #  test:
