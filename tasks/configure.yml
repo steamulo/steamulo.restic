@@ -30,7 +30,7 @@
       #!/usr/bin/env bash
       export RESTIC_REPOSITORY={{ restic_repository.value.location }}
       export RESTIC_PASSWORD={{ restic_repository.value.password }}
-      {% for key, value in restic_repository.value.environment_variables.items() %}
+      {% for key, value in (restic_repository.value.environment_variables | default({})).items() %}
       export {{ key }}={{ value }}
       {% endfor %}
     dest: "{{ restic_scripts_directory }}/restic-config-source-{{ restic_repository.key }}"

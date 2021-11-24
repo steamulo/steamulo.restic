@@ -7,7 +7,7 @@ set -euo pipefail
 -r {{ restic_repositories[repo_name].location }} -p {{ restic_scripts_directory }}/restic-password-{{ repo_name }}
 {%- endmacro %}
 
-{% for key, value in restic_repository.value.environment_variables.items() %}
+{% for key, value in (restic_repository.value.environment_variables | default({})).items() %}
 {{ key }}={{ value }}
 {% endfor %}
 
