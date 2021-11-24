@@ -16,6 +16,10 @@ if ! {{ restic_path }} snapshots {{ repo_args(restic_repository.key) }} --latest
   {{ restic_path }} init {{ repo_args(restic_repository.key) }}
 fi
 
+{% if restic_repository.value.check is defined and restic_repository.value.check %}
+{{ restic_path }} check {{ repo_args(restic_repository.key) }} {{ restic_repository.value.check_args | default ('') }}
+{% endif -%}
+
 {% for folder in restic_folders %}
 {% if restic_repository.key in folder.repositories %}
 {{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ folder.flags | default('') }} --tag {{ folder.tags | join(',') }} {{ folder.paths | map('quote') | join(' ') }}
@@ -30,8 +34,4 @@ fi
 
 {% if restic_repository.value.forget is defined and restic_repository.value.forget %}
 {{ restic_path }} forget {{ repo_args(restic_repository.key) }} {{ restic_repository.value.forget_args | default ('') }}
-{% endif -%}
-
-{% if restic_repository.value.check is defined and restic_repository.value.check %}
-{{ restic_path }} check {{ repo_args(restic_repository.key) }} {{ restic_repository.value.check_args | default ('') }}
 {% endif -%}
