@@ -46,3 +46,9 @@ Author Information
 ------------
 
 Steamulo - www.steamulo.com
+
+Sources and Inspirations
+------------
+- https://blog.cubieserver.de/2021/restic-backups-with-systemd-and-prometheus-exporter/
+- https://github.com/arillso/ansible.restic
+- https://github.com/angristan/ansible-restic

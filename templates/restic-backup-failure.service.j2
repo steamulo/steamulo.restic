@@ -1,0 +1,17 @@
+[Unit]
+Description=Restic backup failure
+Requires=network.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart={{ restic_scripts_directory }}/restic-backup-failure.sh
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+ProtectControlGroups=true
+PrivateDevices=true
+MemoryDenyWriteExecute=true

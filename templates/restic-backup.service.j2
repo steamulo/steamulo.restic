@@ -1,5 +1,9 @@
 [Unit]
 Description=Restic backup
+Requires=network.target
+{% if restic_email_failure_dest is defined and restic_email_failure_dest %}
+OnFailure=restic-backup-failure.service
+{% endif -%}
 
 [Service]
 Type=oneshot
@@ -10,3 +14,12 @@ CPUQuota={{ 10 * ansible_processor_vcpus }}%
 ExecStart={{ restic_scripts_directory }}/restic-backup-{{ repo_name }}.sh
 {% endif -%}
 {% endfor -%}
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+ProtectControlGroups=true
+PrivateDevices=true
+MemoryDenyWriteExecute=true

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# {{ ansible_managed }}
+
+set -euo pipefail
+
+ID=$(systemctl show -p InvocationID --value restic-backup.service)
+LOGS="$(journalctl -u restic-backup.service --no-hostname -o short-iso INVOCATION_ID=${ID} + _SYSTEMD_INVOCATION_ID=${ID})"
+echo "$LOGS" | mail -s "Restic backup failed on {{ ansible_hostname }}" "{{ restic_email_failure_dest }}"

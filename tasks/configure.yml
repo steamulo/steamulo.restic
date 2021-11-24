@@ -55,6 +55,23 @@
   loop_control:
     loop_var: restic_repository
 
+- name: Create restic backup failure script
+  template:
+    src: restic-backup-failure.sh.j2
+    dest: "{{ restic_scripts_directory }}/restic-backup-failure.sh"
+    owner: root
+    group: root
+    mode: '0700'
+  when: restic_email_failure_dest is defined and restic_email_failure_dest
+
+- name: Add systemd service for restic failure
+  template:
+    src: restic-backup-failure.service.j2
+    dest: /etc/systemd/system/restic-backup-failure.service
+    mode: '0644'
+  notify: systemd reload
+  when: restic_email_failure_dest is defined and restic_email_failure_dest
+
 - name: Add systemd service for restic
   template:
     src: restic-backup.service.j2
