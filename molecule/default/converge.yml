@@ -3,7 +3,7 @@
   hosts: instance
   become: true
   roles:
-    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+    - role: "steamulo.restic"
       vars:
         restic_systemd_timer_randomized_delay_sec: 0
         restic_repositories:
