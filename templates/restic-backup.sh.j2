@@ -22,7 +22,9 @@ fi
 
 {% for folder in restic_folders %}
 {% if restic_repository.key in folder.repositories %}
+{{ folder.pre_backup_cmd | default('') }}
 {{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ folder.flags | default('') }} --tag {{ folder.tags | join(',') }} {{ folder.paths | map('quote') | join(' ') }}
+{{ folder.post_backup_cmd | default('') }}
 {% endif -%}
 {% endfor -%}
 

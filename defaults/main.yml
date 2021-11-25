@@ -21,6 +21,8 @@ restic_folders: []
 #  - paths:
 #    repositories: []
 #    tags:
+#    pre_backup_cmd:
+#    post_backup_cmd:
 restic_stdouts: []
 #  - cmd:
 #    filename:
