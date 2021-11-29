@@ -8,4 +8,4 @@
   when: not restic_binary.stat.exists
 
 - include_tasks: configure.yml
-  when: restic_folders or restic_stdouts
+  when: (restic_folders or restic_stdouts) and restic_repositories
