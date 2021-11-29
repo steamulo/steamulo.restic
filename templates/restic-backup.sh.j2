@@ -30,7 +30,7 @@ fi
 
 {% for stdout in restic_stdouts %}
 {% if restic_repository.key in stdout.repositories %}
-{{ stdout.cmd }} | {{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ folder.flags | default('') }} --tag {{ stdout.tags | join(',') }} --stdin --stdin-filename {{ stdout.filename }}
+{{ stdout.cmd | trim }} | {{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ folder.flags | default('') }} --tag {{ stdout.tags | join(',') }} --stdin --stdin-filename {{ stdout.filename }}
 {% endif -%}
 {% endfor -%}
 
