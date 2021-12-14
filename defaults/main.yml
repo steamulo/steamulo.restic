@@ -25,6 +25,9 @@ restic_folders: []
 #    post_backup_cmd:
 restic_stdouts: []
 #  - cmd:
+#    temp_files:
+#      - filename: ""
+#        content: ""
 #    filename:
 #    repositories: []
 #    tags:

@@ -36,7 +36,10 @@
             tags:
               - nonexisting
         restic_stdouts:
-          - cmd: echo "testing"
+          - cmd: cat /tmp/test.txt
+            temp_files:
+              - filename: "test.txt"
+                content: "testing"
             filename: echo.out
             repositories:
               - local
