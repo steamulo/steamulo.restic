@@ -14,6 +14,7 @@ CPUQuota={{ 10 * ansible_processor_vcpus }}%
 ExecStart={{ restic_scripts_directory }}/restic-backup-{{ repo_name }}.sh
 {% endif -%}
 {% endfor -%}
+{% if restic_systemd_hardening_options %}
 PrivateTmp=true
 ProtectHome=true
 ProtectSystem=full
@@ -23,3 +24,4 @@ ProtectControlGroups=true
 ProtectControlGroups=true
 PrivateDevices=true
 MemoryDenyWriteExecute=true
+{% endif -%}

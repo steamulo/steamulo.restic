@@ -34,3 +34,4 @@ restic_stdouts: []
 
 restic_systemd_timer_on_calender: '*-*-* 03:00:00'
 restic_systemd_timer_randomized_delay_sec: 3600
+restic_systemd_hardening_options: true

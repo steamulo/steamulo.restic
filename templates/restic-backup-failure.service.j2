@@ -6,6 +6,7 @@ Requires=network.target
 Type=oneshot
 User=root
 ExecStart={{ restic_scripts_directory }}/restic-backup-failure.sh
+{% if restic_systemd_hardening_options %}
 PrivateTmp=true
 ProtectHome=true
 ProtectSystem=full
@@ -15,3 +16,4 @@ ProtectControlGroups=true
 ProtectControlGroups=true
 PrivateDevices=true
 MemoryDenyWriteExecute=true
+{% endif -%}
