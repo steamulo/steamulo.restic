@@ -33,7 +33,7 @@ fi
 {% for stdout in restic_stdouts %}
 {% if restic_repository.key in stdout.repositories %}
 
-{% for temp_file in stdout.temp_files %}
+{% for temp_file in stdout.temp_files | default([]) %}
 touch /tmp/{{ temp_file.filename }}
 chmod 600 /tmp/{{ temp_file.filename }}
 cat <<EOT > /tmp/{{ temp_file.filename }}
