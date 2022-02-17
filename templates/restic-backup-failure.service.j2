@@ -6,6 +6,7 @@ Requires=network.target
 Type=oneshot
 User=root
 ExecStart={{ restic_scripts_directory }}/restic-backup-failure.sh
+SyslogIdentifier={{ restic_syslog_identifier }}
 {% if restic_systemd_hardening_options %}
 PrivateTmp=true
 ProtectHome=true

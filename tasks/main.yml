@@ -1,4 +1,9 @@
 ---
+
+- name: Install deps packages
+  package:
+    name: "{{ restic_deps_packages }}"
+
 - name: Check if restic is installed
   stat:
     path: '{{ restic_path }}'

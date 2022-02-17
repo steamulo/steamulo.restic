@@ -62,7 +62,6 @@
     owner: root
     group: root
     mode: '0700'
-  when: restic_email_failure_dest is defined and restic_email_failure_dest
 
 - name: Add systemd service for restic failure
   template:
@@ -70,7 +69,6 @@
     dest: /etc/systemd/system/restic-backup-failure.service
     mode: '0644'
   notify: systemd reload
-  when: restic_email_failure_dest is defined and restic_email_failure_dest
 
 - name: Add systemd service for restic
   template:

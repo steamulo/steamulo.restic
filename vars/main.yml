@@ -3,3 +3,4 @@
 restic_deps_packages:
   - bzip2
   - fuse
+  - jq

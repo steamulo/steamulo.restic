@@ -6,6 +6,7 @@
     - role: "steamulo.restic"
       vars:
         restic_systemd_timer_randomized_delay_sec: 0
+        restic_json_log_format: false
         restic_repositories:
           local:
             location: /var/restic_backup

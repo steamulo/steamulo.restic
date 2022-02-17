@@ -3,6 +3,15 @@
 
 set -euo pipefail
 
+{% if restic_json_log_format %}
+echo '{"Backup_status":"failure"}'
+{% else %}
+echo "Backup status : failure"
+{% endif -%}
+
+
+{% if restic_email_failure_dest is defined and restic_email_failure_dest %}
 ID=$(systemctl show -p InvocationID --value restic-backup.service)
 LOGS="$(journalctl -u restic-backup.service --no-hostname -o short-iso INVOCATION_ID=${ID} + _SYSTEMD_INVOCATION_ID=${ID})"
 echo "$LOGS" | mail -s "Restic backup failed on {{ ansible_hostname }}" "{{ restic_email_failure_dest }}"
+{% endif -%}

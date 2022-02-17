@@ -4,6 +4,7 @@
 set -euo pipefail
 
 export GOGC=20
+export RESTIC_PROGRESS_FPS=0.08
 
 {% macro repo_args(repo_name) -%}
 -r {{ restic_repositories[repo_name].location }} -p {{ restic_scripts_directory }}/restic-password-{{ repo_name }}
@@ -19,13 +20,13 @@ if ! {{ restic_path }} snapshots {{ repo_args(restic_repository.key) }} --latest
 fi
 
 {% if restic_repository.value.check is defined and restic_repository.value.check %}
-{{ restic_path }} check {{ repo_args(restic_repository.key) }} {{ restic_repository.value.check_args | default ('') }}
+{{ restic_path }} check {{ repo_args(restic_repository.key) }} {{ restic_json_log_format | ternary('--json', '') }} {{ restic_repository.value.check_args | default ('') }}
 {% endif -%}
 
 {% for folder in restic_folders %}
 {% if restic_repository.key in folder.repositories %}
 {{ folder.pre_backup_cmd | default('') }}
-{{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ folder.flags | default('') }} --tag {{ folder.tags | join(',') }} {{ folder.paths | map('quote') | join(' ') }}
+{{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ restic_json_log_format | ternary('--json', '') }} {{ folder.flags | default('') }} --tag {{ folder.tags | join(',') }} {{ folder.paths | map('quote') | join(' ') }}
 {{ folder.post_backup_cmd | default('') }}
 {% endif -%}
 {% endfor -%}
@@ -41,10 +42,16 @@ cat <<EOT > /tmp/{{ temp_file.filename }}
 EOT
 {% endfor -%}
 
-{{ stdout.cmd | trim }} | {{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ folder.flags | default('') }} --tag {{ stdout.tags | join(',') }} --stdin --stdin-filename {{ stdout.filename }}
+{{ stdout.cmd | trim }} | {{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ restic_json_log_format | ternary('--json', '') }} {{ folder.flags | default('') }} --tag {{ stdout.tags | join(',') }} --stdin --stdin-filename {{ stdout.filename }}
 {% endif -%}
 {% endfor -%}
 
 {% if restic_repository.value.forget is defined and restic_repository.value.forget %}
-{{ restic_path }} forget {{ repo_args(restic_repository.key) }} {{ restic_repository.value.forget_args | default ('') }}
+{{ restic_path }} forget {{ repo_args(restic_repository.key) }} {{ restic_json_log_format | ternary('--json', '') }} {{ restic_repository.value.forget_args | default ('') }}
+{% endif -%}
+
+{% if restic_json_log_format %}
+echo '{"Backup_status":"success"}'
+{% else %}
+echo "Backup status : success"
 {% endif -%}
