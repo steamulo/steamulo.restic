@@ -4,7 +4,7 @@
 set -euo pipefail
 
 {% if restic_json_log_format %}
-echo '{"Backup_status":"failure"}'
+echo '{"backup_status":"failure"}'
 {% else %}
 echo "Backup status : failure"
 {% endif -%}
