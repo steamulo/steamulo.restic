@@ -18,7 +18,8 @@ restic_repositories: {}
 #    environment_variables: {}
 
 restic_folders: []
-#  - paths:
+#  - paths: []
+#    excludes: []
 #    repositories: []
 #    tags:
 #    pre_backup_cmd:

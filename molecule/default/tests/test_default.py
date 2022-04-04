@@ -17,6 +17,12 @@ def test_backup_exists(host):
     assert snapshots[0]["paths"] == ["/usr", "/var/lib"]
 
 
+def test_files_in_backup(host):
+    resp = host.run(". /opt/restic/restic-config-source-local; /usr/local/bin/restic ls latest --tag files -q").stdout
+    assert '/var/lib/systemd/' in resp
+    assert '/var/lib/apt/' not in resp
+
+
 def test_backup_norepo(host):
     resp = host.run(". /opt/restic/restic-config-source-local; /usr/local/bin/restic snapshots --latest 1 --tag nonexisting --json").stdout
     snapshots = json.loads(resp)
