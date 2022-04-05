@@ -1,0 +1,51 @@
+---
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  no_log: "{{ molecule_no_log }}"
+  tasks:
+    - name: Create molecule instance(s)
+      community.docker.docker_container:
+        name: "{{ item.name }}"
+        image: sickcodes/docker-osx:auto
+        tty: true
+        devices:
+          - /dev/kvm
+        published_ports:
+          - "{{ item.port }}:10022"
+        env:
+          GENERATE_UNIQUE: "true"
+          MASTER_PLIST_URL: "https://raw.githubusercontent.com/sickcodes/Docker-OSX/master/custom/config-nopicker-custom.plist"
+      register: server
+      loop: "{{ molecule_yml.platforms }}"
+    - name: Wait for SSH to be ready
+      wait_for:
+        port: "{{ item.port }}"
+        host: localhost
+        search_regex: OpenSSH
+      loop: "{{ molecule_yml.platforms }}"
+    - when: server.changed | default(false) | bool
+      block:
+        - name: Populate instance config dict
+          set_fact:
+            instance_conf_dict: {
+              'instance': "{{ item.name }}",
+              'address': "localhost",
+              'user': "user",
+              'password': "alpine",
+              'port': "{{ item.port }}",
+              'become_pass': "alpine",
+              'become_method': "sudo", }
+          loop: "{{ molecule_yml.platforms }}"
+          register: instance_config_dict
+        - name: Convert instance config dict to a list
+          set_fact:
+            instance_conf: "{{ instance_config_dict.results | map(attribute='ansible_facts.instance_conf_dict') | list }}"
+        - name: Dump instance config
+          copy:
+            content: |
+              # Molecule managed
+
+              {{ instance_conf | to_json | from_json | to_yaml }}
+            dest: "{{ molecule_instance_config }}"
