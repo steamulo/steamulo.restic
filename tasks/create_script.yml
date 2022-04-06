@@ -1,30 +1,31 @@
 ---
 
-- name: Create restic scripts
+- name: Create restic scripts directory
   file:
     path: "{{ restic_scripts_directory }}"
-    owner: "root"
-    group: "root"
-    mode: '0755'
     state: directory
+    owner: root
+    group: "{{ restic_root_group }}"
+    mode: u=rwx,g=rx,o=rx
 
 - name: Getting all used repo
   set_fact:
     restic_used_repositories: "{{ restic_folders | union(restic_stdouts) | map(attribute='repositories') | flatten | unique }}"
 
-- name: Add .restic-password files in home folder
+- name: Create restic-password scripts
+  when: restic_repository.key in restic_used_repositories
   copy:
     content: "{{ restic_repository.value.password }}"
     dest: "{{ restic_scripts_directory }}/restic-password-{{ restic_repository.key }}"
     owner: root
-    group: root
-    mode: "0600"
+    group: "{{ restic_root_group }}"
+    mode: u=rw,g=,o=
   loop: "{{ restic_repositories | dict2items }}"
-  when: restic_repository.key in restic_used_repositories
   loop_control:
     loop_var: restic_repository
 
-- name: Add .restic-config-source files in home folder
+- name: Create restic-config-source scripts
+  when: restic_repository.key in restic_used_repositories
   copy:
     content: |
       #!/usr/bin/env bash
@@ -36,56 +37,28 @@
       {% endfor %}
     dest: "{{ restic_scripts_directory }}/restic-config-source-{{ restic_repository.key }}"
     owner: root
-    group: root
-    mode: "0600"
+    group: "{{ restic_root_group }}"
+    mode: u=rw,g=,o=
   loop: "{{ restic_repositories | dict2items }}"
-  when: restic_repository.key in restic_used_repositories
   loop_control:
     loop_var: restic_repository
 
-- name: Create restic backup script
+- name: Create restic-backup scripts
+  when: restic_repository.key in restic_used_repositories
   template:
     src: restic-backup.sh.j2
     dest: "{{ restic_scripts_directory }}/restic-backup-{{ restic_repository.key }}.sh"
     owner: root
-    group: root
-    mode: '0700'
+    group: "{{ restic_root_group }}"
+    mode: u=rwx,g=,o=
   loop: "{{ restic_repositories | dict2items }}"
-  when: restic_repository.key in restic_used_repositories
   loop_control:
     loop_var: restic_repository
 
-- name: Create restic backup failure script
+- name: Create restic-backup-failure script
   template:
     src: restic-backup-failure.sh.j2
     dest: "{{ restic_scripts_directory }}/restic-backup-failure.sh"
     owner: root
-    group: root
-    mode: '0700'
-
-- name: Add systemd service for restic failure
-  template:
-    src: restic-backup-failure.service.j2
-    dest: /etc/systemd/system/restic-backup-failure.service
-    mode: '0644'
-  notify: systemd reload
-
-- name: Add systemd service for restic
-  template:
-    src: restic-backup.service.j2
-    dest: /etc/systemd/system/restic-backup.service
-    mode: '0644'
-  notify: systemd reload
-
-- name: Add systemd timer for restic
-  template:
-    src: restic-backup.timer.j2
-    dest: /etc/systemd/system/restic-backup.timer
-    mode: '0644'
-  notify: systemd reload
-
-- name: Enable and start restic timer
-  systemd:
-    name: restic-backup.timer
-    enabled: true
-    state: started
+    group: "{{ restic_root_group }}"
+    mode: u=rwx,g=,o=

@@ -33,10 +33,19 @@ restic_stdouts: []
 #    repositories: []
 #    tags:
 
-restic_systemd_timer_on_calender: '*-*-* 03:00:00'
+restic_json_log_format: false
+
+# Linux only
+restic_systemd_timer_on_calendar: '*-*-* 03:00:00'
 restic_systemd_timer_randomized_delay_sec: 3600
 restic_systemd_hardening_options: true
 
 restic_syslog_identifier: "restic-backup"
 
-restic_json_log_format: false
+# Darwin only
+restic_crontab_schedule_minute: "0"
+restic_crontab_schedule_hour: "3"
+restic_crontab_schedule_day: "*"
+restic_crontab_schedule_month: "*"
+restic_crontab_schedule_weekday: "*"
+restic_crontab_log_path: /var/log/restic-backup.log

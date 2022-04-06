@@ -24,10 +24,10 @@
             forget: false
         restic_folders:
           - paths:
-              - /var/lib
+              - /var/log
               - /usr
             excludes:
-              - /var/lib/apt
+              - /var/log/asl
             repositories:
               - local
             tags:

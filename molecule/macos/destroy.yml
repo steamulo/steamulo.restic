@@ -40,4 +40,4 @@
 
           {{ instance_conf | to_json | from_json | to_yaml }}
         dest: "{{ molecule_instance_config }}"
-      when: server.changed | default(false) | bool
+        mode: u=rw,g=r,o=r

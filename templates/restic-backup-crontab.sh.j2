@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# {{ ansible_managed }}
+
+set -euo pipefail
+
+trap 'error' ERR
+
+error() {
+  {{ restic_scripts_directory }}/restic-backup-failure.sh
+}
+
+{% for repo_name, _ in restic_repositories.items() %}
+{% if repo_name in restic_used_repositories %}
+{{ restic_scripts_directory }}/restic-backup-{{ repo_name }}.sh
+{% endif -%}
+{% endfor -%}
