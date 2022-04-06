@@ -34,4 +34,4 @@ jobs:
         env:
           MOLECULE_DISTRO: ${{ matrix.distribution }}
         run: |
-          molecule test --all
+          molecule test
