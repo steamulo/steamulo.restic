@@ -1,6 +1,6 @@
 ---
 
-restic_version: 0.12.1
+restic_version: 0.13.0
 restic_path: /usr/local/bin/restic
 restic_scripts_directory: /opt/restic
 restic_cache_directory: /opt/restic/cache
@@ -34,6 +34,11 @@ restic_stdouts: []
 #    tags:
 
 restic_json_log_format: false
+
+# limit in KiB/s
+restic_download_limit: 0
+restic_upload_limit: 0
+
 
 # Linux only
 restic_systemd_timer_on_calendar: '*-*-* 03:00:00'
