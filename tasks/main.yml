@@ -17,6 +17,7 @@
   when: restic_binary.stat.exists
   command: "{{ restic_path }} version"
   register: restic_installed_version
+  changed_when: false
 
 - name: Check if restic install is needed
   set_fact:
