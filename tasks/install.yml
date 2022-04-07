@@ -29,8 +29,5 @@
 
 - name: Remove downloaded file
   file:
-    path: "{{ item }}"
+    path: "/tmp/restic_{{ restic_version }}_{{ ansible_system | lower }}_amd64"
     state: absent
-  loop:
-    - "/tmp/restic_{{ restic_version }}_{{ ansible_system | lower }}_amd64.bz2"
-    - "/tmp/restic_{{ restic_version }}_{{ ansible_system | lower }}_amd64"

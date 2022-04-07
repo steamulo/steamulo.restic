@@ -13,7 +13,16 @@
     path: "{{ restic_path }}"
   register: restic_binary
 
-- when: not restic_binary.stat.exists
+- name: Check restic version
+  when: restic_binary.stat.exists
+  command: "{{ restic_path }} version"
+  register: restic_installed_version
+
+- name: Check if restic install is needed
+  set_fact:
+    restic_install_needed: "{{ not restic_binary.stat.exists or not restic_installed_version.stdout.startswith('restic ' + restic_version | string ) }}"
+
+- when: restic_install_needed
   include_tasks: install.yml
 
 - when: (restic_folders or restic_stdouts) and restic_repositories
