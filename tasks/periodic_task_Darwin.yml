@@ -1,0 +1,20 @@
+---
+
+- name: Create restic-backup-crontab script
+  template:
+    src: restic-backup-crontab.sh.j2
+    dest: "{{ restic_scripts_directory }}/restic-backup-crontab.sh"
+    owner: root
+    group: "{{ restic_root_group }}"
+    mode: u=rwx,g=,o=
+
+- name: Creates a cron file under /etc/cron.d
+  cron:
+    name: restic-backup
+    user: root
+    minute: "{{ restic_crontab_schedule_minute }}"
+    hour: "{{ restic_crontab_schedule_hour }}"
+    day: "{{ restic_crontab_schedule_day }}"
+    month: "{{ restic_crontab_schedule_month }}"
+    weekday: "{{ restic_crontab_schedule_weekday }}"
+    job: "{{ restic_scripts_directory }}/restic-backup-crontab.sh >> {{ restic_crontab_log_path }} 2>&1"

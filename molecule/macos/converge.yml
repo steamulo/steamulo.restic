@@ -1,0 +1,50 @@
+---
+- name: Converge
+  hosts: macos
+  become: true
+  roles:
+    - role: "steamulo.restic"
+      vars:
+        restic_systemd_timer_randomized_delay_sec: 0
+        restic_json_log_format: false
+        restic_repositories:
+          local:
+            location: /var/restic_backup
+            password: securepassword1
+            check: true
+            check_args: "--read-data-subset=10%"
+            forget: true
+            forget_args: "--prune --group-by paths,tags --keep-within-daily 4d"
+            environment_variables:
+              FOO: BAR
+          notused:
+            location: /var/restic_backup_2
+            password: securepassword1
+            check: false
+            forget: false
+        restic_folders:
+          - paths:
+              - /var/log
+              - /usr
+            excludes:
+              - /var/log/asl
+            repositories:
+              - local
+            tags:
+              - files
+          - paths:
+              - /tmp
+            repositories:
+              - nonexisting
+            tags:
+              - nonexisting
+        restic_stdouts:
+          - cmd: cat /tmp/test.txt
+            temp_files:
+              - filename: "test.txt"
+                content: "testing"
+            filename: echo.out
+            repositories:
+              - local
+            tags:
+              - echo

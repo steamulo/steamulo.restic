@@ -1,0 +1,28 @@
+---
+
+- name: Add systemd service for restic failure
+  template:
+    src: restic-backup-failure.service.j2
+    dest: /etc/systemd/system/restic-backup-failure.service
+    mode: u=rw,g=r,o=r
+  notify: systemd reload
+
+- name: Add systemd service for restic
+  template:
+    src: restic-backup.service.j2
+    dest: /etc/systemd/system/restic-backup.service
+    mode: u=rw,g=r,o=r
+  notify: systemd reload
+
+- name: Add systemd timer for restic
+  template:
+    src: restic-backup.timer.j2
+    dest: /etc/systemd/system/restic-backup.timer
+    mode: u=rw,g=r,o=r
+  notify: systemd reload
+
+- name: Enable and start restic timer
+  systemd:
+    name: restic-backup.timer
+    enabled: true
+    state: started

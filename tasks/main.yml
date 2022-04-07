@@ -1,16 +1,23 @@
 ---
 
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_system }}.yml"
+
 - name: Install deps packages
+  when: ansible_system == "Linux"
   package:
     name: "{{ restic_deps_packages }}"
 
 - name: Check if restic is installed
   stat:
-    path: '{{ restic_path }}'
+    path: "{{ restic_path }}"
   register: restic_binary
 
-- include_tasks: install.yml
-  when: not restic_binary.stat.exists
+- when: not restic_binary.stat.exists
+  include_tasks: install.yml
 
-- include_tasks: configure.yml
-  when: (restic_folders or restic_stdouts) and restic_repositories
+- when: (restic_folders or restic_stdouts) and restic_repositories
+  include_tasks: create_script.yml
+
+- when: (restic_folders or restic_stdouts) and restic_repositories
+  include_tasks: periodic_task_{{ ansible_system }}.yml
