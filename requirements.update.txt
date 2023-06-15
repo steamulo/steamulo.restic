@@ -1,0 +1,6 @@
+ansible
+ansible-lint
+flake8
+molecule>=5.0.1
+molecule-plugins[docker]
+yamllint

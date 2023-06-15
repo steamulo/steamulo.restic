@@ -19,7 +19,11 @@ setup_env () {
 }
 
 update_requirements () {
-  pip freeze > ${CUR_MOL_VENV_DIR}/$PYTHON_REQUIREMENTS_FILE
+  _python_requirements_file=$PYTHON_REQUIREMENTS_FILE
+  PYTHON_REQUIREMENTS_FILE=requirements.update.txt
+  rebuild_env
+  PYTHON_REQUIREMENTS_FILE=$_python_requirements_file
+  python -m pip freeze > ${CUR_MOL_VENV_DIR}/$PYTHON_REQUIREMENTS_FILE
 }
 
 rebuild_env () {
