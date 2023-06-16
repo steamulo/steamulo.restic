@@ -6,7 +6,7 @@ galaxy_info:
   description: Production grade installation and deployment of restic
   company: Steamulo
   license: BSD
-  min_ansible_version: 2.7
+  min_ansible_version: "2.7"
   platforms:
     - name: Ubuntu
       versions:
@@ -14,5 +14,5 @@ galaxy_info:
         - focal
     - name: EL
       versions:
-        - 7
-        - 8
+        - "7"
+        - "8"
