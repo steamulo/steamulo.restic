@@ -1,7 +1,7 @@
 ---
 
 - name: Create restic-backup-crontab script
-  template:
+  ansible.builtin.template:
     src: restic-backup-crontab.sh.j2
     dest: "{{ restic_scripts_directory }}/restic-backup-crontab.sh"
     owner: root
@@ -9,7 +9,7 @@
     mode: u=rwx,g=,o=
 
 - name: Creates a cron file under /etc/cron.d
-  cron:
+  ansible.builtin.cron:
     name: restic-backup
     user: root
     minute: "{{ restic_crontab_schedule_minute }}"

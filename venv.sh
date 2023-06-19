@@ -12,14 +12,18 @@ setup_env () {
   then
     source ${CUR_MOL_VENV_DIR}/.virtualenv/${dir}/bin/activate
   else
-    virtualenv -p `which python3` ${CUR_MOL_VENV_DIR}/.virtualenv/${dir} && source ${CUR_MOL_VENV_DIR}/.virtualenv/${dir}/bin/activate
+    virtualenv -p `which python3.8` ${CUR_MOL_VENV_DIR}/.virtualenv/${dir} && source ${CUR_MOL_VENV_DIR}/.virtualenv/${dir}/bin/activate
     python -m pip install --upgrade pip
     python -m pip install -r ${CUR_MOL_VENV_DIR}/$PYTHON_REQUIREMENTS_FILE
   fi
 }
 
 update_requirements () {
-  pip freeze > ${CUR_MOL_VENV_DIR}/$PYTHON_REQUIREMENTS_FILE
+  _python_requirements_file=$PYTHON_REQUIREMENTS_FILE
+  PYTHON_REQUIREMENTS_FILE=requirements.update.txt
+  rebuild_env
+  PYTHON_REQUIREMENTS_FILE=$_python_requirements_file
+  python -m pip freeze > ${CUR_MOL_VENV_DIR}/$PYTHON_REQUIREMENTS_FILE
 }
 
 rebuild_env () {

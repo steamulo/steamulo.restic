@@ -1,7 +1,7 @@
 ---
 
 - name: Create restic scripts directory
-  file:
+  ansible.builtin.file:
     path: "{{ restic_scripts_directory }}"
     state: directory
     owner: root
@@ -9,12 +9,12 @@
     mode: u=rwx,g=rx,o=rx
 
 - name: Getting all used repo
-  set_fact:
+  ansible.builtin.set_fact:
     restic_used_repositories: "{{ restic_folders | union(restic_stdouts) | map(attribute='repositories') | flatten | unique }}"
 
 - name: Create restic-password scripts
   when: restic_repository.key in restic_used_repositories
-  copy:
+  ansible.builtin.copy:
     content: "{{ restic_repository.value.password }}"
     dest: "{{ restic_scripts_directory }}/restic-password-{{ restic_repository.key }}"
     owner: root
@@ -26,7 +26,7 @@
 
 - name: Create restic-config-source scripts
   when: restic_repository.key in restic_used_repositories
-  copy:
+  ansible.builtin.copy:
     content: |
       #!/usr/bin/env bash
       export RESTIC_REPOSITORY={{ restic_repository.value.location }}
@@ -45,7 +45,7 @@
 
 - name: Create restic-backup scripts
   when: restic_repository.key in restic_used_repositories
-  template:
+  ansible.builtin.template:
     src: restic-backup.sh.j2
     dest: "{{ restic_scripts_directory }}/restic-backup-{{ restic_repository.key }}.sh"
     owner: root
@@ -56,7 +56,7 @@
     loop_var: restic_repository
 
 - name: Create restic-backup-failure script
-  template:
+  ansible.builtin.template:
     src: restic-backup-failure.sh.j2
     dest: "{{ restic_scripts_directory }}/restic-backup-failure.sh"
     owner: root
