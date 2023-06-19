@@ -1,0 +1,7 @@
+ansible
+ansible-lint<=6.12 # Latest to support Python 3.8
+flake8
+molecule
+molecule-plugins[docker]
+pytest-testinfra
+yamllint

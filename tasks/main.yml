@@ -1,33 +1,42 @@
 ---
 
 - name: Include OS-specific variables.
-  include_vars: "{{ ansible_system }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_system }}.yml"
+
+- name: Update apt cache
+  when: ansible_os_family == "Debian"
+  ansible.builtin.apt:
+    update_cache: true
 
 - name: Install deps packages
   when: ansible_system == "Linux"
-  package:
+  ansible.builtin.package:
     name: "{{ restic_deps_packages }}"
+    state: present
 
 - name: Check if restic is installed
-  stat:
+  ansible.builtin.stat:
     path: "{{ restic_path }}"
   register: restic_binary
 
 - name: Check restic version
   when: restic_binary.stat.exists
-  command: "{{ restic_path }} version"
+  ansible.builtin.command: "{{ restic_path }} version"
   register: restic_installed_version
   changed_when: false
 
 - name: Check if restic install is needed
-  set_fact:
-    restic_install_needed: "{{ not restic_binary.stat.exists or not restic_installed_version.stdout.startswith('restic ' + restic_version | string ) }}"
+  ansible.builtin.set_fact:
+    restic_install_needed: "{{ not restic_binary.stat.exists or not restic_installed_version.stdout.startswith('restic ' + restic_version | string) }}"
 
-- when: restic_install_needed
-  include_tasks: install.yml
+- name: Install restic
+  when: restic_install_needed
+  ansible.builtin.include_tasks: install.yml
 
-- when: (restic_folders or restic_stdouts) and restic_repositories
-  include_tasks: create_script.yml
+- name: Create scripts
+  when: (restic_folders or restic_stdouts) and restic_repositories
+  ansible.builtin.include_tasks: create_script.yml
 
-- when: (restic_folders or restic_stdouts) and restic_repositories
-  include_tasks: periodic_task_{{ ansible_system }}.yml
+- name: Create periodic tasks
+  when: (restic_folders or restic_stdouts) and restic_repositories
+  ansible.builtin.include_tasks: periodic_task_{{ ansible_system }}.yml
