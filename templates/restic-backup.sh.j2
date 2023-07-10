@@ -41,7 +41,7 @@ fi
 {% for temp_file in stdout.temp_files | default([]) %}
 touch /tmp/{{ temp_file.filename }}
 chmod 600 /tmp/{{ temp_file.filename }}
-cat <<EOT > /tmp/{{ temp_file.filename }}
+cat <<'EOT' > /tmp/{{ temp_file.filename }}
 {{ temp_file.content }}
 EOT
 {% endfor -%}
