@@ -12,7 +12,7 @@ setup_env () {
   then
     source ${CUR_MOL_VENV_DIR}/.virtualenv/${dir}/bin/activate
   else
-    virtualenv -p `which python3.8` ${CUR_MOL_VENV_DIR}/.virtualenv/${dir} && source ${CUR_MOL_VENV_DIR}/.virtualenv/${dir}/bin/activate
+    virtualenv -p `which python3.10` ${CUR_MOL_VENV_DIR}/.virtualenv/${dir} && source ${CUR_MOL_VENV_DIR}/.virtualenv/${dir}/bin/activate
     python -m pip install --upgrade pip
     python -m pip install -r ${CUR_MOL_VENV_DIR}/$PYTHON_REQUIREMENTS_FILE
   fi
@@ -44,4 +44,6 @@ echo "############################################################"
 echo "Type 'deactivate' to quit venv"
 echo "Type 'download_galaxy' to download ansible roles"
 echo "Type 'rebuild_env' to update your virtualenv"
+echo "Type 'update_requirements' to update your requirements.txt"
+echo "  using libraries found in requirements.update.txt"
 echo "############################################################"
