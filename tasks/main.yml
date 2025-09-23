@@ -7,6 +7,19 @@
   when: ansible_os_family == "Debian"
   ansible.builtin.apt:
     update_cache: true
+    cache_valid_time: 86400
+
+- name: Validate variables types
+  ansible.builtin.assert:
+    that:
+      - restic_repositories is mapping
+      - restic_folders is iterable
+      - restic_stdouts is iterable
+    quiet: true
+
+- name: Compute used repositories
+  ansible.builtin.set_fact:
+    restic_used_repositories: "{{ restic_folders | union(restic_stdouts) | map(attribute='repositories') | flatten | unique }}"
 
 - name: Install deps packages
   when: ansible_system == "Linux"
@@ -28,6 +41,18 @@
 - name: Check if restic install is needed
   ansible.builtin.set_fact:
     restic_install_needed: "{{ not restic_binary.stat.exists or not restic_installed_version.stdout.startswith('restic ' + restic_version | string) }}"
+
+- name: Validate used repositories definitions
+  vars:
+    known_used_repos: "{{ (restic_used_repositories | default([])) | intersect(restic_repositories.keys() | list) }}"
+  ansible.builtin.assert:
+    that:
+      - restic_repositories[item].location is defined
+      - restic_repositories[item].password is defined
+    fail_msg: "Le dépôt '{{ item }}' doit définir 'location' et 'password'"
+    quiet: true
+  loop: "{{ known_used_repos }}"
+  when: (restic_folders or restic_stdouts)
 
 - name: Install restic
   when: restic_install_needed

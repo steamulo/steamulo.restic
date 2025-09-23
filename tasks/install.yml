@@ -1,15 +1,33 @@
 ---
 
+- name: Detect restic target OS and arch
+  ansible.builtin.set_fact:
+    restic_os: "{{ ansible_system | lower }}"
+    restic_arch: >-
+      {{ 'amd64' if ansible_architecture in ['x86_64', 'amd64'] else
+         'arm64' if ansible_architecture in ['aarch64', 'arm64'] else
+         'amd64' }}
+
 - name: Download restic
   ansible.builtin.get_url:
-    url: "https://github.com/restic/restic/releases/download/v{{ restic_version }}/restic_{{ restic_version }}_{{ ansible_system | lower }}_amd64.bz2"
-    dest: "/tmp/restic_{{ restic_version }}_{{ ansible_system | lower }}_amd64.bz2"
+    url: "https://github.com/restic/restic/releases/download/v{{ restic_version }}/restic_{{ restic_version }}_{{ restic_os }}_{{ restic_arch }}.bz2"
+    dest: "/tmp/restic_{{ restic_version }}_{{ restic_os }}_{{ restic_arch }}.bz2"
     mode: 'u=rw,g=r,o=r'
+    checksum: "{{ restic_checksum if restic_checksum else omit }}"
+  register: restic_download
+  retries: 3
+  delay: 3
+  until: restic_download is succeeded
 
 - name: Extract restic
-  ansible.builtin.command: "bzip2 -d /tmp/restic_{{ restic_version }}_{{ ansible_system | lower }}_amd64.bz2"
+  ansible.builtin.command: "bzip2 -d /tmp/restic_{{ restic_version }}_{{ restic_os }}_{{ restic_arch }}.bz2"
   args:
-    creates: "/tmp/restic_{{ restic_version }}_{{ ansible_system | lower }}_amd64"
+    creates: "/tmp/restic_{{ restic_version }}_{{ restic_os }}_{{ restic_arch }}"
+
+- name: Remove downloaded archive
+  ansible.builtin.file:
+    path: "/tmp/restic_{{ restic_version }}_{{ restic_os }}_{{ restic_arch }}.bz2"
+    state: absent
 
 - name: "Ensure {{ restic_path | dirname }} exists"
   ansible.builtin.file:
@@ -22,7 +40,7 @@
 - name: Install restic
   ansible.builtin.copy:
     remote_src: true
-    src: "/tmp/restic_{{ restic_version }}_{{ ansible_system | lower }}_amd64"
+    src: "/tmp/restic_{{ restic_version }}_{{ restic_os }}_{{ restic_arch }}"
     dest: "{{ restic_path }}"
     owner: root
     group: "{{ restic_root_group }}"
@@ -30,5 +48,5 @@
 
 - name: Remove downloaded file
   ansible.builtin.file:
-    path: "/tmp/restic_{{ restic_version }}_{{ ansible_system | lower }}_amd64"
+    path: "/tmp/restic_{{ restic_version }}_{{ restic_os }}_{{ restic_arch }}"
     state: absent

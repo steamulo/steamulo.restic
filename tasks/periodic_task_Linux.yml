@@ -21,8 +21,12 @@
     mode: u=rw,g=r,o=r
   notify: Reload systemd
 
+- name: Apply systemd reload now
+  ansible.builtin.meta: flush_handlers
+
 - name: Enable and start restic timer
   ansible.builtin.systemd:
     name: restic-backup.timer
     enabled: true
     state: started
+    daemon_reload: true

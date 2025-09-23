@@ -2,6 +2,7 @@
 # {{ ansible_managed }}
 
 set -euo pipefail
+umask 077
 
 export GOGC=20
 export RESTIC_PROGRESS_FPS=0.08
@@ -16,7 +17,7 @@ export RESTIC_PROGRESS_FPS=0.08
 
 export RESTIC_CACHE_DIR={{ restic_cache_directory }}
 {% for key, value in (restic_repository.value.environment_variables | default({})).items() %}
-export {{ key }}={{ value }}
+export {{ key }}='{{ value | replace("'", "'\\''") }}'
 {% endfor %}
 
 if ! {{ restic_path }} snapshots {{ repo_args(restic_repository.key) }} --latest 1 > /dev/null 2>&1; then
@@ -30,7 +31,8 @@ fi
 {% for folder in restic_folders %}
 {% if restic_repository.key in folder.repositories %}
 {{ folder.pre_backup_cmd | default('') }}
-{{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ global_flags() }} {{ folder.flags | default('') }} --tag {{ folder.tags | join(',') }} {{ folder.excludes | default ([]) | map('quote') | map('regex_replace', '^(.*)$', '--exclude \\1')  | join(' ') }} {{ folder.paths | map('quote') | join(' ') }}
+{% set f_tags = folder.tags | default([]) %}
+{{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ global_flags() }} {{ folder.flags | default('') }}{% if f_tags is string and (f_tags | length) > 0 %} --tag {{ f_tags }}{% elif f_tags is iterable and (f_tags | length) > 0 %} --tag {{ f_tags | join(',') }}{% endif %} {{ folder.excludes | default ([]) | map('quote') | map('regex_replace', '^(.*)$', '--exclude \\1')  | join(' ') }} {{ folder.paths | map('quote') | join(' ') }}
 {{ folder.post_backup_cmd | default('') }}
 {% endif -%}
 {% endfor -%}
@@ -46,7 +48,8 @@ cat <<'EOT' > /tmp/{{ temp_file.filename }}
 EOT
 {% endfor -%}
 
-{{ stdout.cmd | trim }} | {{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ global_flags() }} {{ folder.flags | default('') }} --tag {{ stdout.tags | join(',') }} --stdin --stdin-filename {{ stdout.filename }}
+{% set s_tags = stdout.tags | default([]) %}
+{{ stdout.cmd | trim }} | {{ restic_path }} backup {{ repo_args(restic_repository.key) }} {{ global_flags() }} {{ stdout.flags | default('') }}{% if s_tags is string and (s_tags | length) > 0 %} --tag {{ s_tags }}{% elif s_tags is iterable and (s_tags | length) > 0 %} --tag {{ s_tags | join(',') }}{% endif %} --stdin --stdin-filename {{ stdout.filename }}
 {% endif -%}
 {% endfor -%}
 

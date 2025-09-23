@@ -8,12 +8,21 @@
     group: "{{ restic_root_group }}"
     mode: u=rwx,g=rx,o=rx
 
+- name: Ensure restic cache directory exists
+  ansible.builtin.file:
+    path: "{{ restic_cache_directory }}"
+    state: directory
+    owner: root
+    group: "{{ restic_root_group }}"
+    mode: u=rwx,g=,o=
+
 - name: Getting all used repo
   ansible.builtin.set_fact:
     restic_used_repositories: "{{ restic_folders | union(restic_stdouts) | map(attribute='repositories') | flatten | unique }}"
 
 - name: Create restic-password scripts
   when: restic_repository.key in restic_used_repositories
+  no_log: true
   ansible.builtin.copy:
     content: "{{ restic_repository.value.password }}"
     dest: "{{ restic_scripts_directory }}/restic-password-{{ restic_repository.key }}"
@@ -26,6 +35,7 @@
 
 - name: Create restic-config-source scripts
   when: restic_repository.key in restic_used_repositories
+  no_log: true
   ansible.builtin.copy:
     content: |
       #!/usr/bin/env bash
@@ -33,7 +43,7 @@
       export RESTIC_PASSWORD={{ restic_repository.value.password }}
       export RESTIC_CACHE_DIR={{ restic_cache_directory }}
       {% for key, value in (restic_repository.value.environment_variables | default({})).items() %}
-      export {{ key }}={{ value }}
+      export {{ key }}='{{ value | replace("'", "'\\''") }}'
       {% endfor %}
     dest: "{{ restic_scripts_directory }}/restic-config-source-{{ restic_repository.key }}"
     owner: root

@@ -5,6 +5,10 @@ restic_path: /usr/local/bin/restic
 restic_scripts_directory: /opt/restic
 restic_cache_directory: /opt/restic/cache
 
+# Facultatif: checksum du binaire restic (format supporté par get_url, ex: sha256:abcd...)
+# Laisser vide pour ne pas vérifier.
+restic_checksum: ""
+
 restic_email_failure_dest: ""
 
 restic_repositories: {}

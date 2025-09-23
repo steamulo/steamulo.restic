@@ -6,7 +6,7 @@ OnFailure=restic-backup-failure.service
 [Service]
 Type=oneshot
 User=root
-CPUQuota={{ 10 * ansible_processor_vcpus }}%
+CPUQuota={{ 10 * (ansible_processor_vcpus | default(1) | int) }}%
 {% for repo_name, _ in restic_repositories.items() %}
 {% if repo_name in restic_used_repositories %}
 ExecStart={{ restic_scripts_directory }}/restic-backup-{{ repo_name }}.sh
@@ -19,7 +19,6 @@ ProtectHome=true
 ProtectSystem=full
 ProtectKernelModules=true
 ProtectKernelTunables=true
-ProtectControlGroups=true
 ProtectControlGroups=true
 PrivateDevices=true
 MemoryDenyWriteExecute=true

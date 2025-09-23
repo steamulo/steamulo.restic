@@ -8,6 +8,14 @@
     group: "{{ restic_root_group }}"
     mode: u=rwx,g=,o=
 
+- name: Ensure crontab log directory exists
+  ansible.builtin.file:
+    path: "{{ restic_crontab_log_path | dirname }}"
+    state: directory
+    owner: root
+    group: "{{ restic_root_group }}"
+    mode: u=rwx,g=rx,o=rx
+
 - name: Creates a cron file under /etc/cron.d
   ansible.builtin.cron:
     name: restic-backup
